@@ -1,0 +1,7 @@
+#!/bin/bash
+
+if [ "$(echo -e "No\nYes" | dmenu -i -nb black -nf red -sb red -sf black -p "Shutdown?")" == "Yes" ]; then
+    shutdown now
+else
+    exit 1;
+fi
