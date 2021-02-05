@@ -1,0 +1,13 @@
+#!/bin/bash
+
+Selection=$(echo -e "Qutebrowser\nTor Browser" | dmenu -i -p Browser:)
+
+case "$Selection" in
+    Qutebrowser)    qutebrowser; exit ;;
+    "Tor Browser")  Check=$(echo -e "Yes\nNo" | dmenu -i -n 1 -p "Are you sure?");
+                    case "$Check" in
+                        Yes)    torbrowser-launcher; exit ;;
+                        No)     exit ;;
+                    esac; exit ;;
+    *)              exit ;;
+esac

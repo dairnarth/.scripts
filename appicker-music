@@ -1,0 +1,9 @@
+#!/bin/bash
+
+Selection=$(echo -e "Apple_Music\ncmus" | dmenu -i -p Music:)
+
+case "$Selection" in
+    Apple_Music)    apple-music-electron; exit ;;
+    cmus)           st -c cmus -e cmus; exit ;;
+    *)              exit ;;
+esac

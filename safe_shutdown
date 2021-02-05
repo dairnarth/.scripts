@@ -1,7 +1,17 @@
 #!/bin/bash
 
-if [ "$(echo -e "No\nYes" | dmenu -i -nb black -nf red -sb red -sf black -p "Shutdown?")" == "Yes" ]; then
-    shutdown now
-else
-    exit 1;
-fi
+Selection=$(echo -e "Shutdown\nRestart" | dmenu -i -p "Power off:")
+case "$Selection" in
+    Shutdown)   if [ "$(echo -e "Yes\nNo" | dmenu -i -n 1 -nf red -sb red -sf black -p "[S] Are you sure?")" == "Yes" ]; then
+                     shutdown now;
+                else
+                    exit;
+                fi
+                exit ;;
+    Restart)    if [ "$(echo -e "Yes\nNo" | dmenu -i -n 1 -p "[R] Are you sure?")" == "Yes" ]; then
+                     reboot;
+                else
+                    exit;
+                fi
+                exit ;;
+esac

@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# PATHS #
+dmenuP="/usr/local/src/suckless/dmenu/dch-dmenu/config.h"
+dwmP="/usr/local/src/suckless/dwm/dch-dwm/config.def.h"
+newsboatP="$HOME/.newsboat/config"
+stP="/usr/local/src/suckless/st/ls-st/config.h"
+
+# Script #
+dmenucmd="dmenu -i -p Config:"
+mkvar="$"
+
+if [ -z "$*" ]; then
+    Selection=$(echo -e "dmenu\ndwm\nnewsboat\nst" | $dmenucmd)
+else
+    Selection="$1"
+fi
+
+case "$Selection" in
+    dmenu)      FilePath=$dmenuP ;;
+    dwm)        FilePath=$dwmP ;;
+    newsboat)   FilePath=$newsboatP ;;
+    st)         FilePath=$stP ;;
+    *)          exit ;;
+esac
+
+ConfCmd="st -c sys-config -t $Selection-config -g 80x60+2570+80 -e vim -c :Code"
+$ConfCmd $FilePath
+
+exit
