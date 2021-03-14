@@ -3,7 +3,7 @@
 # dmenu asks for input
 query=$(echo | dmenu -i -p Search:)
 # if esc cancel
-if [ -z "$query" ]; then exit; fi
-# qutebrowser opens page
+[ -z "$query" ] && exit
+#qutebrowser opens page
 exec $BROWSER "$query"
 
