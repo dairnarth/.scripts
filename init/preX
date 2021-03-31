@@ -1,0 +1,48 @@
+#!/usr/bin/bash
+
+# # # # #
+# Main  #
+# # # # #
+
+main ()
+{
+    succ="\n\e[1m [\e[32m "
+    fail="\n\e[1m [\e[31m "
+    end=" \e[0m\e[1m] \e[0m\n"
+
+    mountPlexMedia
+    initVPN
+    initGUI
+}
+
+# # # # # # # # # # # # # #
+# FUNCTION IMPLEMENTATION #
+# # # # # # # # # # # # # #
+
+mountPlexMedia ()
+{
+    [ -e "$HOME/PlexMedia/Movies" ] &&                      \
+        echo -e "$succ PLEXMEDIA MOUNTED $end" &&           \
+        return ||                                           \
+        sshfs cs@192.168.1.110:Media/ $HOME/PlexMedia/ &&   \
+        echo -e "$succ PLEXMEDIA MOUNTED $end" ||           \
+        echo -e "$fail PLEXMEDIA NOT MOUNTED $end"
+}
+
+initVPN ()
+{
+    pgrep openvpn &>/dev/null &&                        \
+        echo -e "$succ VPN CONNECTED $end" &&           \
+        return ||                                       \
+        yes | doas surfshark-vpn attack &>/dev/null &&  \
+        echo -e "$succ VPN CONNECTED $end" ||           \
+        echo -e "$fail VPN NOT CONNECTED $end"
+}
+
+initGUI ()
+{
+    [[ "$(tty)" == "/dev/tty1" ]] &&              \
+        exec startx
+}
+
+main
