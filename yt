@@ -21,7 +21,7 @@ if [ -z "$*" ]; then
 	read -r query
 else
 	case "$1" in
-		-r) query=$(cat $histfile | $guicmd -l 15 -p YouTube:)
+		-r) query=$(tac $histfile | $guicmd -l 15 -p YouTube:)
 			promptcmd="$guicmd -l 15 -p Results: ";;
 		*) query="$*";;
 	esac
@@ -74,7 +74,7 @@ while true; do
 	echo "Choose Video/Playlist to play: "
 	choice=$(echo -e "$ids" | cut -d'	' -f2 | $promptcmd) # dont show id
 	[ -z "$choice" ] && exit	# if esc-ed then exit
-    echo $choice >> $histfile
+    cat $histfile | grep $choice &>/dev/null || echo $choice >> $histfile # if $choice isn't already in $histfile, add it
 	id=$(echo -e "$ids" | grep -Fwm1 "$choice" | cut -d'	' -f1) # get id of choice
 	echo -e "$choice\t($id)"
 	case $id in

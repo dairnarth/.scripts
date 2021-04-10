@@ -1,30 +1,76 @@
 #!/bin/bash
 
-# PATHS #
-dmenuP="/usr/local/src/suckless/dmenu/dch-dmenu/config.h"
-dwmP="/usr/local/src/suckless/dwm/dch-dwm/config.def.h"
-newsboatP="$HOME/.newsboat/config"
-stP="/usr/local/src/suckless/st/ls-st/config.h"
+main ()
+{
+    dmenuP="/usr/local/src/suckless/dmenu/dch-dmenu/"
+    dmenuO="/usr/local/src/suckless/dmenu/original/dmenu-5.0"
+    dmenuD="$HOME/.config/suckless/dch-dmenu.diff"
+    dwmP="/usr/local/src/suckless/dwm/dch-dwm/"
+    dwmO="/usr/local/src/suckless/dwm/original/dwm-6.2"
+    dwmD="$HOME/.config/suckless/dch-dwm.diff"
+    stP="/usr/local/src/suckless/st/dch-st/"
+    stO="/usr/local/src/suckless/st/original/st-0.8.4"
+    stD="$HOME/.config/suckless/dch-st.diff"
+    
+    dmenucmd="dmenu -i -p Config:"
 
-# Script #
-dmenucmd="dmenu -i -p Config:"
-mkvar="$"
+    [[ -z "$*" ]] && exit
+    
+    case "$1" in
+        -d)
+            newarg=$(echo -e "dmenu\ndwm\nnewsboat\nst" | $dmenucmd)
+            exec st -t $newarg-config -e config_menu $newarg ;;
+        *)
+            Selection="$1" ;;
+    esac
 
-if [ -z "$*" ]; then
-    Selection=$(echo -e "dmenu\ndwm\nnewsboat\nst" | $dmenucmd)
-else
-    Selection="$1"
-fi
+    case "$Selection" in
+        dmenu)
+            cpath=$dmenuP
+            dpath=$dmenuD
+            opath=$dmenuO ;;
+        dwm)
+            cpath=$dwmP
+            dpath=$dwmD
+            opath=$dwmO ;;
+        st)
+            cpath=$stP
+            dpath=$stD
+            opath=$stO ;;
+        *)
+            exit ;;
+    esac
 
-case "$Selection" in
-    dmenu)      FilePath=$dmenuP ;;
-    dwm)        FilePath=$dwmP ;;
-    newsboat)   FilePath=$newsboatP ;;
-    st)         FilePath=$stP ;;
-    *)          exit ;;
-esac
+    cd $cpath
+    ranger $cpath
+    echo -n "Recompile? [Y/n] "
+    read -r yn
+    case $yn in
+        Y | y | "")
+            echo ""
+            doas make clean install     && \
+                echo -e "\nRecompiled"  || \
+                echo -e "\nFailed to Recompile"
+            unset $yn
+            echo -n "Diff? [Y/n] "
+            read -r yn
+            case $yn in
+                Y | y | "" )
+                    rm $dpath
+                    echo
+                    diff -up $opath ./ > $dpath     && \
+                        echo -e "\n.diff created,"  || \
+                        echo -e "\nFailed to create diff"
+                    ;;
+                * )
+                    echo -e "\nNo .diff created"
+                    return ;;
+            esac
+            ;;
+            * )
+            return ;;
+    esac
+    unset $yn
+}
 
-ConfCmd="st -c sys-config -t $Selection-config -g 80x60+2570+80 -e vim -c :Code"
-$ConfCmd $FilePath
-
-exit
+main "$*"
