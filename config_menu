@@ -11,14 +11,15 @@ main ()
     stP="/usr/local/src/suckless/st/dch-st/"
     stO="/usr/local/src/suckless/st/original/st-0.8.4"
     stD="$HOME/.config/suckless/dch-st.diff"
-    
+
     dmenucmd="dmenu -i -p Config:"
 
     [[ -z "$*" ]] && exit
-    
+
     case "$1" in
         -d)
             newarg=$(echo -e "dmenu\ndwm\nnewsboat\nst" | $dmenucmd)
+            [[ -z "$newarg" ]] && exit
             exec st -t $newarg-config -e config_menu $newarg ;;
         *)
             Selection="$1" ;;
@@ -58,7 +59,7 @@ main ()
                 Y | y | "" )
                     rm $dpath
                     echo
-                    diff -up $opath ./ > $dpath     && \
+                    diff -up $opath $cpath > $dpath     && \
                         echo -e "\n.diff created,"  || \
                         echo -e "\nFailed to create diff"
                     ;;

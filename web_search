@@ -1,9 +1,14 @@
 #!/bin/bash
 
-db=$HOME/.local/share/qutebrowser/history.sqlite
-# dmenu asks for input
-query=$(sqlite3 "$db" "select url, title, atime from History" | tac | awk -F '|' '{print $1}' | dmenu -i -l 15 -p Search:)
-# if esc cancel
-[ -z "$query" ] && exit
-# qutebrowser opens page
-exec $BROWSER "$query"
+main ()
+{
+    db=$HOME/.local/share/qutebrowser/history.sqlite
+    # dmenu asks for input
+    query=$(sqlite3 "$db" "select url, title, atime from History" | tac | awk -F '|' '{print $1}' | dmenu -i -l 15 -p Search:)
+    # if esc cancel
+    [ -z "$query" ] && exit
+    # qutebrowser opens page
+    exec $BROWSER "$query"
+}
+
+main

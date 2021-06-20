@@ -2,8 +2,8 @@
 
 Selection=$(echo -e "Shutdown\nRestart" | dmenu -i -p "Power off:")
 case "$Selection" in
-    Shutdown)   [ "$(echo -e "Yes\nNo" | dmenu -i -n 1 -nf red -sb red -sf black -p "[S] Are you sure?")" == "Yes" ] && doas surfshark-vpn down && shutdown now || exit;
+    Shutdown)   [ "$(echo -e "Yes\nNo" | dmenu -i -n 1 -nf red -sb red -sf black -p "[S] Are you sure?")" == "Yes" ] && doas surfshark-vpn down && shutdown now || exit 1;
                 exit ;;
-    Restart)    [ "$(echo -e "Yes\nNo" | dmenu -i -n 1 -p "[R] Are you sure?")" == "Yes" ] && reboot || exit;
+    Restart)    [ "$(echo -e "Yes\nNo" | dmenu -i -n 1 -p "[R] Are you sure?")" == "Yes" ] && doas surfshark-vpn down && reboot || exit 1;
                 exit ;;
 esac
