@@ -6,7 +6,7 @@ if [ -e /sys/class/power_supply/BAT0/capacity ]; then
         [[ "$bat" -lt 10 ]] && showbat="00$bat"
         [[ "$bat" -lt 100 ]] && showbat="0$bat"
 
-        xsetroot -name " $showbat $(/bin/date "+%y%m%d %H%M%S") "
+        xsetroot -name " $(/bin/date "+%y%m%d %H%M%S") $showbat "
         sleep 1s
     done &
 else
