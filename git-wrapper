@@ -2,33 +2,37 @@
 
 main()
 {
-    case "$1" in
+    if [ "$1" == "-d" ]; then
+        gitcmd="git --git-dir=$HOME/dotfiles --work-tree=$HOME"
+        gitarg="$2"
+        shift 2
+    else
+        gitcmd="git"
+        gitarg="$1"
+        shift
+    fi
+
+    case "$gitarg" in
         ps)
-            shift
-            git push "$@"
+            $gitcmd push "$@"
             ;;
         pl)
-            shift
-            git pull "$@"
+            $gitcmd pull "$@"
             ;;
         st)
-            shift
-            git status "$@"
+            $gitcmd status "$@"
             ;;
         cm)
-            shift
-            git commit "$@"
+            $gitcmd commit "$@"
             ;;
         a)
-            shift
-            git add "$@"
+            $gitcmd add "$@"
             ;;
         co)
-            shift
-            git checkout "$@"
+            $gitcmd checkout "$@"
             ;;
         *)
-            git "$@"
+            $gitcmd "$gitarg" "$@"
             ;;
     esac
 }
