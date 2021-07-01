@@ -1,21 +1,28 @@
 #!/bin/bash
 
-Selection=$(echo -e "Shutdown\nRestart" | dmenu -i -p "Power off:")
-case "$Selection" in
-    Shutdown)
-        if [ "$(echo -e "Yes\nNo" | dmenu -i -n 1 -nf red -sb red -sf black -p "[S] Are you sure?")" == "Yes" ]; then
-            type -P surfshark-vpn &>/dev/null && doas surfshark-vpn down
-            shutdown now
-        else
-            exit 1
-        fi
-        exit ;;
-    Restart)
-        if [ "$(echo -e "Yes\nNo" | dmenu -i -n 1 -p "[R] Are you sure?")" == "Yes" ]; the
-            type -P surfshark-vpn &>/dev/null && doas surfshark-vpn down
-            reboot
-        else
-            exit 1;
-        fi
-        exit ;;
-esac
+main()
+{
+    Selection=$(echo -e "Shutdown\nRestart" | dmenu -i -p "Power off:")
+    case "$Selection" in
+        Shutdown)
+            local sYN="$(echo -e "Yes\nNo" | dmenu -i -n 1 -nf red -sb red -sf black -p "[S] Are you sure?")"
+            if [ "$sYN" == "Yes" ]; then
+                type -P surfshark-vpn &>/dev/null && doas surfshark-vpn down
+                shutdown now;
+            else
+                exit 1
+            fi
+            exit ;;
+        Restart)
+            local rYN="$(echo -e "Yes\nNo" | dmenu -i -n 1 -p "[R] Are you sure?")"
+            if [ "$rYN" == "Yes" ]; then
+                type -P surfshark-vpn &>/dev/null && doas surfshark-vpn down
+                reboot
+            else
+                exit 1;
+            fi
+            exit ;;
+    esac
+}
+
+main
