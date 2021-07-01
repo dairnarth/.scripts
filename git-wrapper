@@ -1,0 +1,36 @@
+#!/bin/bash
+
+main()
+{
+    case "$1" in
+        ps)
+            shift
+            git push "$@"
+            ;;
+        pl)
+            shift
+            git pull "$@"
+            ;;
+        st)
+            shift
+            git status "$@"
+            ;;
+        cm)
+            shift
+            git commit "$@"
+            ;;
+        a)
+            shift
+            git add "$@"
+            ;;
+        co)
+            shift
+            git checkout "$@"
+            ;;
+        *)
+            git "$@"
+            ;;
+    esac
+}
+
+main "$@"
