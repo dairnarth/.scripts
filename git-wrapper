@@ -19,7 +19,7 @@ main()
         pl)
             $gitcmd pull "$@"
             ;;
-        'st'|'')
+        st)
             $gitcmd status "$@"
             ;;
         cm)
@@ -30,6 +30,9 @@ main()
             ;;
         co)
             $gitcmd checkout "$@"
+            ;;
+        '')
+            $gitcmd status
             ;;
         *)
             $gitcmd "$gitarg" "$@"
