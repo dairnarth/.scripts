@@ -7,6 +7,7 @@
 main ()
 {
     [[ "$(tty)" == "/dev/tty6" ]] && return
+    [[ "$TERM" == "screen" ]] && return
     mountPlexMedia
     initVPN
     initGUI
@@ -21,13 +22,13 @@ initGUI ()
     [[ "$(tty)" == "/dev/tty1" ]] &&                \
         exec startx
     [[ "$(tty)" == "/dev/tty2" ]] &&                \
-        exec dvtm
+        exec tmux
 }
 
 initVPN ()
 {
     OldIP="$(curl ip.me 2>/dev/null)"
-    
+
     pgrep openvpn &>/dev/null &&                        \
         printpretty 0 "VPN CONNECTED"                   \
             "VPN IP Address: $OldIP" &&                 \
@@ -80,6 +81,6 @@ printpretty ()
         *)
             exit ;;
     esac
-} 
+}
 
 main
