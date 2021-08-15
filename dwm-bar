@@ -2,9 +2,13 @@
 if [ -e /sys/class/power_supply/BAT0/capacity ]; then
     while true; do
         bat="$(cat /sys/class/power_supply/BAT0/capacity)"
-        [[ "$bat" -ge 100 ]] && showbat="$bat" ||       \
-            [[ "$bat" -lt 10 ]] && showbat="00$bat" ||  \
-            [[ "$bat" -lt 100 ]] && showbat="0$bat"
+        if [[ "$bat" -ge 100 ]]; then
+            showbat="$bat"
+        elif [[ "$bat" -lt 10 ]]; then
+            showbat="00$bat"
+        else
+            showbat="0$bat"
+        fi
 
         xsetroot -name " $(/bin/date "+%y%m%d %H%M%S") $showbat "
         sleep 1s
