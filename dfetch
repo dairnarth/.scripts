@@ -2,30 +2,16 @@
 
 main ()
 {
-    kernel="$(uname -r)"
-    kernellen="${#kernel}"
-    cpu="$(grep model\ name /proc/cpuinfo | head -1 | awk '{print $6" "$9}')"
-    cpulen="${#cpu}"
-    if [[ -e /sys/class/power_supply/BAT0/capacity ]]; then
-        bat="$(cat /sys/class/power_supply/BAT0/capacity)"
-        [[ "$bat" -ge 100 ]] && showbat="$bat" ||   \
-            [[ "$bat" -lt 10 ]] && showbat="00$bat" ||  \
-            [[ "$bat" -lt 100 ]] && showbat="0$bat"
-        tdb="$(date "+%y%m%d %H%M%S") $showbat"
-    else
-        tdb="$(date "+%y%m%d %H%M%S")"
-    fi
-    tdblen="${#tdb}"
-    pack="$(pacman -Qq | wc -l) packages"
-    packlen="${#pack}"
-    [[ -e /etc/os-release ]] &&                 \
-        eval $(grep "^NAME" /etc/os-release) && \
-        os="$NAME" &&                           \
-        unset NAME
-    oslen="${#os}"
-
+    #setup || return 1
+    setvar
     dchdecal
     fetch
+    cleanup
+}
+
+setup ()
+{
+    [[ $(tput cols) -lt 78 ]] && echo "Not enough space. (Minimum 78 columns.)" && return 1
 }
 
 dchdecal ()
@@ -53,23 +39,62 @@ dchdecal ()
     echo -e $'\e[0m                                                                             '
 }
 
+setvar ()
+{
+    # CPU
+    cpu="$(grep model\ name /proc/cpuinfo | head -1 | awk '{print $6" "$9}')"
+    cpulen="${#cpu}"
+    # Kernel
+    kernel="$(uname -r)"
+    kernellen="${#kernel}"
+    # Memory
+    mem="$(free --mega | awk '/^Mem/{print $3"MB/"$2"MB"}')"
+    memlen="${#mem}"
+    # OS
+    [[ -e /etc/os-release ]] &&                 \
+        eval $(grep "^NAME" /etc/os-release) && \
+        os="$NAME" &&                           \
+        unset NAME
+    oslen="${#os}"
+}
+
+cleanup ()
+{
+    unset cpu
+    unset cpulen
+    unset kernel
+    unset kernellen
+    unset mem
+    unset memlen
+    unset os
+    unset oslen
+}
+
 fetch ()
 {
     printf \\33[7A
-    printf \\33[38C
-    echo -en "\e[107m  \e[47m  \e[100m  \e[0m  "
-    printf \\33[16C\\33["$tdblen"D
-    echo -e "$tdb"
-    printf \\33[38C
-    echo -e "\e[41m  \e[101m  \e[42m  \e[102m  \e[43m  \e[103m  \e[44m  \e[104m  \e[45m  \e[105m  \e[46m  \e[106m  \e[0m"
-    printf \\33[62C\\33["$oslen"D
+    printf \\33[40C
+    echo -n "OS:"
+    printf \\33[19C\\33["$oslen"D
     echo "$os"
-    printf \\33[62C\\33["$kernellen"D
+    printf \\33[40C
+    echo -n "KNL:"
+    printf \\33[18C\\33["$kernellen"D
     echo "$kernel"
-    printf \\33[62C\\33["$cpulen"D
+    printf \\33[40C
+    echo -n "CPU:"
+    printf \\33[18C\\33["$cpulen"D
     echo "$cpu"
-    printf \\33[62C\\33["$packlen"D
-    echo "$pack"
+    printf \\33[40C
+    echo -n "MEM:"
+    printf \\33[18C\\33["$memlen"D
+    echo "$mem"
+    printf \\33[40C
+    echo -n "COL:"
+    printf \\33[2C
+    echo -e "\e[40m  \e[41m  \e[42m  \e[43m  \e[44m  \e[45m  \e[46m  \e[47m  \e[0m"
+    printf \\33[46C
+    echo -e "\e[100m  \e[101m  \e[102m  \e[103m  \e[104m  \e[105m  \e[106m  \e[107m  \e[0m"
     printf \\33[1B
 }
 
