@@ -2,8 +2,36 @@
 
 main ()
 {
+    kernel="$(uname -r)"
+    kernellen="${#kernel}"
+    cpu="$(grep model\ name /proc/cpuinfo | head -1 | awk '{print $6" "$9}')"
+    cpulen="${#cpu}"
+    if [[ -e /sys/class/power_supply/BAT0/capacity ]]; then
+        bat="$(cat /sys/class/power_supply/BAT0/capacity)"
+        [[ "$bat" -ge 100 ]] && showbat="$bat" ||   \
+            [[ "$bat" -lt 10 ]] && showbat="00$bat" ||  \
+            [[ "$bat" -lt 100 ]] && showbat="0$bat"
+        tdb="$(date "+%y%m%d %H%M%S") $showbat"
+    else
+        tdb="$(date "+%y%m%d %H%M%S")"
+    fi
+    tdblen="${#tdb}"
+    pack="$(pacman -Qq | wc -l) packages"
+    packlen="${#pack}"
+    [[ -e /etc/os-release ]] &&                 \
+        eval $(grep "^NAME" /etc/os-release) && \
+        os="$NAME" &&                           \
+        unset NAME
+    oslen="${#os}"
+
+    dchdecal
+    fetch
+}
+
+dchdecal ()
+{
     echo -e $'                                                                              '
-    echo -e $'\e[0;36m                    ▄                                                         ' 
+    echo -e $'\e[0;36m                    ▄                                                         '
     echo -e $'\e[0;36m                   ▟█▙         \e[1;31m....             \e[35m...                           '
     echo -e $'\e[0;36m                  ▟███▙    \e[1;31m.xH888888Hx.      \e[35mxH88"`~ .x8X         \e[34m.xHL        '
     echo -e $'\e[0;36m                 ▟█████▙ \e[1;31m.H8888888888888:  \e[35m:8888   .f"8888Hf   \e[34m.-`8888hxxx~   '
@@ -16,24 +44,33 @@ main ()
     echo -e $'\e[0;36m          ▟███████████████\e[1;31;46mX888\e[49m88888hx. ..! \e[35m`8888  `-*""  \e[34m\'\e[35m/\e[34m88> 888"      8888 '
     echo -e $'\e[0;36m         ▟█████████▛▀▀▜██\e[1;31;46m!\e[0;36m███\e[1;31;46m"*\e[49m888888888"    \e[35m"888.      :"\e[34m"8` .8" ..     88*  '
     echo -e $'\e[0;36m        ▟████████▛      ▜███████\e[1;31m^"***"`        \e[35m`""***~"`     \e[34m`  x8888h. d*"   '
-    echo -e $"\e[0;36m       ▟█████████        ████████▙\e[0m               $(date +%y%m%d) $(date +%H%M%S) \e[1;34m!\"\"*888%~      "
-    # if [ -e /sys/class/power_supply/BAT0/capacity ]; then
-        # if [ $(cat /sys/class/power_supply/BAT0/capacity) ==  100 ]
-        # then
-        #     echo -e $"\e[0;36m      ▟██████████        █████\e[40m▆▅▄▃▂\e[1;4;37m      $(date +%y%m%d) $(date +%H%M%S) $(cat /sys/class/power_supply/BAT0/capacity) \e[5;21;24;32;49m ※ \e[0m)\e[1;34m!   \`\"  .      "
-        # elif [ $(cat /sys/class/power_supply/BAT0/capacity) <= 20 ]; then
-        # 	echo -e $"\e[0;36m      ▟██████████        █████\e[40m▆▅▄▃▂\e[1;4;37m      $(date +%y%m%d) $(date +%H%M%S) 0$(cat /sys/class/power_supply/BAT0/capacity) \e[5;21;24;31;49m ※ \e[0m)\e[1;34m!   \`\"  .      "
-        # else
-        #     echo -e $"\e[0;36m      ▟██████████        █████\e[40m▆▅▄▃▂\e[1;4;37m      $(date +%y%m%d) $(date +%H%M%S) 0$(cat /sys/class/power_supply/BAT0/capacity) \e[5;21;24;33;49m ※ \e[0m)\e[1;34m!   \`\"  .      "
-        # fi 2>/dev/null
-    # else
-        echo -e $"\e[0;36m      ▟██████████        █████\e[40m▆▅▄▃▂\e[0m                            \e[1;34m!   \`\"  .      "
-    # fi
+    echo -e $"\e[0;36m       ▟█████████        ████████▙\e[0m                             \e[1;34m!\"\"*888%~      "
+    echo -e $"\e[0;36m      ▟██████████        █████▆▅▄▃▂\e[0m                            \e[1;34m!   \`\"  .      "
     echo -e $'\e[0;36m     ▟██████████▛        ▜█████████▙                           \e[1;34m\'-....:~       '
     echo -e $'\e[0;36m    ▟██████▀▀▀              ▀▀██████▙                                         '
     echo -e $'\e[0;36m   ▟███▀▘                       ▝▀███▙                                        '
     echo -e $'\e[0;36m  ▟▛▀                               ▀▜▙                                       '
     echo -e $'\e[0m                                                                             '
+}
+
+fetch ()
+{
+    printf \\33[7A
+    printf \\33[38C
+    echo -en "\e[107m  \e[47m  \e[100m  \e[0m  "
+    printf \\33[16C\\33["$tdblen"D
+    echo -e "$tdb"
+    printf \\33[38C
+    echo -e "\e[41m  \e[101m  \e[42m  \e[102m  \e[43m  \e[103m  \e[44m  \e[104m  \e[45m  \e[105m  \e[46m  \e[106m  \e[0m"
+    printf \\33[62C\\33["$oslen"D
+    echo "$os"
+    printf \\33[62C\\33["$kernellen"D
+    echo "$kernel"
+    printf \\33[62C\\33["$cpulen"D
+    echo "$cpu"
+    printf \\33[62C\\33["$packlen"D
+    echo "$pack"
+    printf \\33[1B
 }
 
 main
