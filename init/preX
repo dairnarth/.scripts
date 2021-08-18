@@ -4,62 +4,64 @@
 # Main  #
 # # # # #
 
-main ()
+preX::main ()
 {
     [[ "$(tty)" == "/dev/tty6" ]] && return
     [[ "$TERM" == "screen" ]] && return
-    mountPlexMedia
-    initVPN
-    initGUI
+    preX::mountPlexMedia
+    preX::initVPN
+    preX::cleanup
+    preX::initGUI
 }
 
 # # # # # # # # # # # # # #
 # FUNCTION IMPLEMENTATION #
 # # # # # # # # # # # # # #
 
-initGUI ()
+preX::initGUI ()
 {
+    unset -f initGUI
     [[ "$(tty)" == "/dev/tty1" ]] &&                \
         exec startx
     [[ "$(tty)" == "/dev/tty2" ]] &&                \
         exec tmux
 }
 
-initVPN ()
+preX::initVPN ()
 {
     OldIP="$(curl ip.me 2>/dev/null)"
 
     pgrep openvpn &>/dev/null &&                        \
-        printpretty 0 "VPN CONNECTED"                   \
+        preX::printpretty 0 "VPN CONNECTED"                   \
             "VPN IP Address: $OldIP" &&                 \
         return ||                                       \
         yes | doas surfshark-vpn attack &>/dev/null &&  \
         NewIP="$(curl ip.me 2>/dev/null)" &&            \
-        printpretty 0 "VPN CONNECTED"                   \
+        preX::printpretty 0 "VPN CONNECTED"                   \
             "Old IP Address: $OldIP"                    \
             "VPN IP Address: $NewIP" &&                 \
         return ||                                       \
-        printpretty 2 "VPN RETRYING" &&                 \
+        preX::printpretty 2 "VPN RETRYING" &&                 \
         doas surfshark-vpn down &>/dev/null &&          \
         yes | doas surfshark-vpn attack &>/dev/null &&  \
         NewIP="$(curl ip.me 2>/dev/null)" &&            \
-        printpretty 0 "VPN CONNECTED"                   \
+        preX::printpretty 0 "VPN CONNECTED"                   \
             "Old IP Address: $OldIP"                    \
             "VPN IP Address: $NewIP" ||                 \
-        printpretty 1 "VPN NOT CONNECTED" "IP Address: $OldIP"
+        preX::printpretty 1 "VPN NOT CONNECTED" "IP Address: $OldIP"
 }
 
-mountPlexMedia ()
+preX::mountPlexMedia ()
 {
     [[ -e "$HOME/PlexMedia/Movies" ]] &&                    \
-        printpretty 0 "PLEXMEDIA MOUNTED" &&                \
+        preX::printpretty 0 "PLEXMEDIA MOUNTED" &&                \
         return ||                                           \
         sshfs cs@192.168.1.110:Media/ $HOME/PlexMedia/ &&   \
-        printpretty 0 "PLEXMEDIA MOUNTED" ||                \
-        printpretty 1 "PLEXMEDIA NOT MOUNTED"
+        preX::printpretty 0 "PLEXMEDIA MOUNTED" ||                \
+        preX::printpretty 1 "PLEXMEDIA NOT MOUNTED"
 }
 
-printpretty ()
+preX::printpretty ()
 {
     [[ -z "$2" ]] && exit 1
 
@@ -83,4 +85,20 @@ printpretty ()
     esac
 }
 
-main
+preX::cleanup ()
+{
+    # Variables
+    unset i
+    unset NewIP
+    unset OldIP
+    # Functions
+    unset -f preX::preX::mountPlexMedia
+    unset -f preX::preX::initVPN
+    unset -f preX::preX::printpretty
+    unset -f preX::preX::main
+    unset -f preX::preX::cleanup
+}
+
+preX::main
+preX::cleanup
+unset -f preX::initGUI
