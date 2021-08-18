@@ -1,0 +1,46 @@
+#!/bin/bash
+
+tmux-scratchpad::main ()
+{
+    tmux-scratchpad::setvar
+
+    if tmux attach-session -t $SESSION 2>/dev/null; then
+        exit 0
+    else
+        tmux-scratchpad::createSession
+    fi
+
+    tmux-scratchpad::cleanup
+}
+
+tmux-scratchpad::createSession ()
+{
+    tmux new -s $SESSION -d
+    tmux rename-window -t $SESSION shell
+    tmux new-window -t $SESSION
+    tmux rename-window -t $SESSION sys-mon
+    tmux send-keys -t $SESSION 'htop' Enter
+    tmux send-keys -t $SESSION
+    tmux split-window -h -t $SESSION
+    tmux send-keys -t $SESSION \
+        'clear; tput civis; while true; do sensors | grep "Pack\|Core\|Exha"; tput cup 0 0; sleep 2; done' Enter
+    tmux split-window -v -t $SESSION
+    tmux send-keys -t $SESSION 'paru' Enter
+    tmux select-pane -t $SESSION -U
+    tmux resize-pane -t $SESSION -y 1
+    tmux select-pane -t $SESSION -D
+    tmux select-window -t $SESSION:0.0
+    tmux attach -t $SESSION
+}
+
+tmux-scratchpad::cleanup ()
+{
+    unset SESSION
+}
+
+tmux-scratchpad::setvar ()
+{
+    SESSION="scratchpad"
+}
+
+tmux-scratchpad::main
