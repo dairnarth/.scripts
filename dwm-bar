@@ -1,21 +1,14 @@
 #!/bin/bash
+
 if [ -e /sys/class/power_supply/BAT0/capacity ]; then
     while true; do
-        bat="$(cat /sys/class/power_supply/BAT0/capacity)"
-        if [[ "$bat" -ge 100 ]]; then
-            showbat="$bat"
-        elif [[ "$bat" -lt 10 ]]; then
-            showbat="00$bat"
-        else
-            showbat="0$bat"
-        fi
-
-        xsetroot -name " $(/bin/date "+%y%m%d %H%M%S") $showbat "
+        printf -v barformat ' %(%y%m%d %H%M%S)T %03d ' -1 "$(< /sys/class/power_supply/BAT0/capacity)"
+        xsetroot -name "$barformat"
         sleep 1s
-    done &
+    done
 else
     while true; do
-        xsetroot -name " $(/bin/date "+%y%m%d %H%M%S") "
+        printf -v barformat ' %(%y%m%d %H%M%S)T ' -1
         sleep 1s
-    done &
+    done
 fi
