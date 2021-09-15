@@ -7,9 +7,9 @@
 preX::main ()
 {
     [[ "$(tty)" == "/dev/tty6" ]] && return
-    [[ "$TERM" == "screen" ]] && return
+    [[ "$TERM" == "tmux-256color" ]] && return
     preX::mountPlexMedia
-    preX::initVPN
+    type -P surfshark-vpn && preX::initVPN
     preX::cleanup
     preX::initGUI
 }
@@ -20,11 +20,16 @@ preX::main ()
 
 preX::initGUI ()
 {
-    unset -f initGUI
-    [[ "$(tty)" == "/dev/tty1" ]] &&                \
-        exec startx
-    [[ "$(tty)" == "/dev/tty2" ]] &&                \
-        exec tmux
+    unset -f preX::initGUI
+    if [[ "$(tty)" == "/dev/tty1" ]]; then
+        exec startx ~/.xinitrc dwm
+    elif [[ "$(tty)" == "/dev/tty2" ]]; then
+        exec startx ~/.xinitrc vswm
+    else
+        echo "Choose a Window Manager:"
+        read sel
+        exec startx ~/.xinitrc $sel
+    fi
 }
 
 preX::initVPN ()
@@ -92,13 +97,11 @@ preX::cleanup ()
     unset NewIP
     unset OldIP
     # Functions
-    unset -f preX::preX::mountPlexMedia
-    unset -f preX::preX::initVPN
-    unset -f preX::preX::printpretty
-    unset -f preX::preX::main
-    unset -f preX::preX::cleanup
+    unset -f preX::mountPlexMedia
+    unset -f preX::initVPN
+    unset -f preX::printpretty
+    unset -f preX::main
+    unset -f preX::cleanup
 }
 
 preX::main
-preX::cleanup
-unset -f preX::initGUI
