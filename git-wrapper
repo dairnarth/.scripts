@@ -31,6 +31,12 @@ main()
         co)
             $gitcmd checkout "$@"
             ;;
+        l)
+            $gitcmd log "$@"
+            ;;
+        lg)
+            $gitcmd log --oneline --graph --decorate "$@"
+            ;;
         '')
             $gitcmd status
             ;;
