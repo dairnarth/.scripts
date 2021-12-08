@@ -11,8 +11,8 @@ dfetch::main ()
 dfetch::setup ()
 {
     cols=$(tput cols)
-    [[ $cols -lt 39 ]] && echo -e "Not enough space.\n\nYou have $cols columns.\nMinimum required is 39." && return 1
-    [[ $cols -lt 78 ]] && shape=height || shape=width
+    (( cols < 39 )) && printf "Not enough space.\n\nYou have %s columns.\nMinimum required is 39.\n" "$cols" >&2 && return 1
+    (( cols < 78 )) && shape=height || shape=width
     unset cols
 }
 
