@@ -1,77 +1,81 @@
 #!/bin/bash
 
-main ()
-{
-    dmenuP="/usr/local/src/suckless/dmenu/dch-dmenu/"
-    dmenuO="/usr/local/src/suckless/dmenu/original/dmenu-5.0"
-    dmenuD="$HOME/.config/suckless/dch-dmenu.diff"
-    dwmP="/usr/local/src/suckless/dwm/dch-dwm/"
-    dwmO="/usr/local/src/suckless/dwm/original/dwm-6.2"
-    dwmD="$HOME/.config/suckless/dch-dwm.diff"
-    stP="/usr/local/src/suckless/st/dch-st/"
-    stO="/usr/local/src/suckless/st/original/st-0.8.4"
-    stD="$HOME/.config/suckless/dch-st.diff"
+dmenuP="/usr/local/src/suckless/dmenu/dch-dmenu/"
+dmenuO="/usr/local/src/suckless/dmenu/original/dmenu-5.0"
+dmenuD="$HOME/.config/suckless/dch-dmenu.diff"
+dwmP="/usr/local/src/suckless/dwm/dch-dwm/"
+dwmO="/usr/local/src/suckless/dwm/original/dwm-6.2"
+dwmD="$HOME/.config/suckless/dch-dwm.diff"
+stP="/usr/local/src/suckless/st/dch-st/"
+stO="/usr/local/src/suckless/st/original/st-0.8.4"
+stD="$HOME/.config/suckless/dch-st.diff"
 
-    dmenucmd="dmenu -i -p Config:"
+dmenucmd="dmenu -i -p Config:"
 
-    [[ -z "$*" ]] && exit
+[[ -z "$*" ]] && exit
 
-    case "$1" in
-        -d)
-            newarg=$(echo -e "dmenu\ndwm\nnewsboat\nst" | $dmenucmd)
-            [[ -z "$newarg" ]] && exit
-            exec st -t $newarg-config -e config_menu $newarg ;;
-        *)
-            Selection="$1" ;;
-    esac
+case "$1" in
+    -d)
+        newarg=$(echo -e "dmenu\ndwm\nnewsboat\nst" | $dmenucmd)
+        [[ -z "$newarg" ]] && exit
+        exec st -t $newarg-config -e config_menu $newarg ;;
+    *)
+        Selection="$1" ;;
+esac
 
-    case "$Selection" in
-        dmenu)
-            cpath=$dmenuP
-            dpath=$dmenuD
-            opath=$dmenuO ;;
-        dwm)
-            cpath=$dwmP
-            dpath=$dwmD
-            opath=$dwmO ;;
-        st)
-            cpath=$stP
-            dpath=$stD
-            opath=$stO ;;
-        *)
-            exit ;;
-    esac
+case "$Selection" in
+    dmenu)
+        cpath=$dmenuP
+        dpath=$dmenuD
+        opath=$dmenuO ;;
+    dwm)
+        cpath=$dwmP
+        dpath=$dwmD
+        opath=$dwmO ;;
+    st)
+        cpath=$stP
+        dpath=$stD
+        opath=$stO ;;
+    *)
+        exit ;;
+esac
 
-    cd $cpath
-    ranger $cpath
-    echo -n "Recompile? [Y/n] "
-    read -r yn
-    case $yn in
-        Y | y | "")
-            echo ""
-            doas make clean install     && \
-                echo -e "\nRecompiled"  || \
-                echo -e "\nFailed to Recompile"
-            unset $yn
-            echo -n "Diff? [Y/n] "
-            read -r yn
-            case $yn in
-                Y | y | "" )
-                    rm $dpath
-                    echo
-                    diff -up $opath $cpath > $dpath     && \
-                        echo -e "\n.diff created,"  || \
-                        echo -e "\nFailed to create diff"
-                    ;;
-                * )
-                    echo -e "\nNo .diff created"
-                    return ;;
-            esac
-            ;;
+# TODO: Test this before deleting the case statement above #
+#SelectionP="${Selection}P"
+#SelectionD="${Selection}D"
+#SelectionO="${Selection}O"
+#
+#cpath=${!SelectionP}
+#dpath=${!SelectionD}
+#opath=${!SelectionO}
+
+cd $cpath
+ranger $cpath
+echo -n "Recompile? [Y/n] "
+read -r yn
+case $yn in
+    Y | y | "")
+        echo ""
+        doas make clean install     && \
+            echo -e "\nRecompiled"  || \
+            echo -e "\nFailed to Recompile"
+        unset $yn
+        echo -n "Diff? [Y/n] "
+        read -r yn
+        case $yn in
+            Y | y | "" )
+                rm $dpath
+                echo
+                diff -up $opath $cpath > $dpath     && \
+                    echo -e "\n.diff created,"  || \
+                    echo -e "\nFailed to create diff"
+                ;;
             * )
-            return ;;
-    esac
-    unset $yn
-}
-
-main "$*"
+                echo -e "\nNo .diff created"
+                return ;;
+        esac
+        ;;
+        * )
+        return ;;
+esac
+unset $yn
