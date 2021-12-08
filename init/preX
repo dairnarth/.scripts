@@ -22,9 +22,18 @@ preX::initGUI ()
 {
     unset -f preX::initGUI
     if [[ "$(tty)" == "/dev/tty1" ]]; then
-        exec startx ~/.xinitrc dwm
+        while true; do
+            startx ~/.xinitrc vswm
+            read -sn 1 -t 1 quit
+            case ${quit,} in
+                '') ;;
+                * )
+                    exit
+                    ;;
+            esac
+        done
     elif [[ "$(tty)" == "/dev/tty2" ]]; then
-        exec startx ~/.xinitrc vswm
+        exec startx ~/.xinitrc dwm
     else
         echo "Choose a Window Manager:"
         read sel
