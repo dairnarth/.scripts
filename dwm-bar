@@ -2,13 +2,13 @@
 
 if [ -e /sys/class/power_supply/BAT0/capacity ]; then
     while true; do
-        printf -v barformat ' %(%y%m%d %H%M%S)T %03d ' -1 "$(< /sys/class/power_supply/BAT0/capacity)"
+        printf -v barformat '%(%y%m%d %H%M%S)T %03d ' -1 "$(< /sys/class/power_supply/BAT0/capacity)"
         xsetroot -name "$barformat"
         sleep 1s
     done
 else
     while true; do
-        printf -v barformat ' %(%y%m%d %H%M%S)T ' -1
+        printf -v barformat '%(%y%m%d %H%M%S)T ' -1
         xsetroot -name "$barformat"
         sleep 1s
     done

@@ -33,7 +33,7 @@ case "$gitarg" in
         $gitcmd log "$@"
         ;;
     lg)
-        $gitcmd log --oneline --graph --decorate "$@"
+        $gitcmd log --branches --oneline --graph --decorate "$@"
         ;;
     '')
         $gitcmd status

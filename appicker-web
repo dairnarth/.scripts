@@ -17,7 +17,7 @@ case "$Selection" in
                 exit ;;
         esac
         exit ;;
-    "Tor Browser")  
+    "Tor Browser")
         Check=$(echo -e "Yes\nNo" | dmenu -i -n 1 -p "Are you sure?");
         case "$Check" in
             Yes)    torbrowser-launcher; exit ;;

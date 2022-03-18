@@ -1,0 +1,42 @@
+#!/bin/bash
+
+while getopts 'b:duv:' arg; do
+    case $arg in
+        b)  cmd='b'
+            action="$OPTARG"
+            ;;
+        d)  inc=0
+            ;;
+        v)  cmd='v'
+            action="$OPTARG"
+            ;;
+        u)  inc=1
+            ;;
+    esac
+done
+
+if [[ $cmd == "b" ]]; then
+    [[ $inc == 1 ]] && \
+        cmdarg='-A' || \
+        cmdarg='-U'
+    light "$cmdarg" "$action"
+    printf -v ret '%3.0f' "$(light -G)"
+    dunstify -h string:x-dunst-stack-tag:brt -h "int:value:$ret" "Brightness: $ret%"
+fi
+
+if [[ $cmd == "v" ]]; then
+    [[ $inc == 1 ]] && \
+        cmdarg='-i' || \
+        cmdarg='-d'
+    case $action in
+        m)  pamixer -t
+            ;;
+        *)  pamixer "$cmdarg" "$action"
+            ;;
+    esac
+    printf -v num '%3d' "$(pamixer --get-volume)"
+    ret="$num%"
+    pamixer --get-mute &>/dev/null && \
+        ret='Mute'
+    dunstify -h string:x-dunst-stack-tag:vol -h "int:value:$num" "Volume: $ret"
+fi
