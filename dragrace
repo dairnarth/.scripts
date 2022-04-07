@@ -1,0 +1,5 @@
+#!/bin/bash
+
+time for i in $(seq 1 $1); do
+    $2 &>/dev/null
+done
